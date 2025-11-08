@@ -152,6 +152,10 @@ func AddMenu(masterPass string) {
 
 	fullVault, err := vault.ReadVault(masterPass)
 	if err != nil {
+		vault, err := vault.ReadVault(string(password))
+		if err != nil {
+			log.Fatal(vault)
+		}
 		log.Fatal(err)
 	}
 

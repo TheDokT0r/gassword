@@ -7,11 +7,22 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 
 	"atomicgo.dev/keyboard"
 	"atomicgo.dev/keyboard/keys"
 	"github.com/fatih/color"
 	"golang.org/x/term"
+)
+
+const (
+	Up = iota
+	Down
+	Add
+	Edit
+	Remove
+	View
+	None
 )
 
 func CreatePassword() string {
@@ -60,16 +71,6 @@ func Login() []byte {
 
 	return password
 }
-
-const (
-	Up = iota
-	Down
-	Add
-	Edit
-	Remove
-	View
-	None
-)
 
 func MainMenu(password string, index int) {
 	fullVault, err := vault.ReadVault(password)
@@ -121,7 +122,7 @@ func printMainMenu(vault []vault.VaultItem, count int) {
 			c := color.New(color.FgBlue)
 			c.Print(">> ")
 		}
-		fmt.Println(string(index) + ". " + vault.Name)
+		fmt.Println(strconv.Itoa(index) + ". " + vault.Name)
 	}
 
 	if len(vault) == 0 {

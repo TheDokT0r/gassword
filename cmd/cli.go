@@ -11,7 +11,6 @@ import (
 
 	"atomicgo.dev/keyboard"
 	"atomicgo.dev/keyboard/keys"
-	"github.com/fatih/color"
 	"golang.org/x/term"
 )
 
@@ -23,6 +22,14 @@ const (
 	Remove
 	View
 	None
+)
+
+const (
+	Reset = "\033[0m"
+	Red   = "\033[31m"
+	Green = "\033[32m"
+	Blue  = "\033[34m"
+	Bold  = "\033[1m"
 )
 
 func CreatePassword() string {
@@ -119,8 +126,7 @@ func keyboardActionDetection() int {
 func printMainMenu(vault []vault.VaultItem, count int) {
 	for index, vault := range vault {
 		if index == count {
-			c := color.New(color.FgBlue)
-			c.Print(">> ")
+			fmt.Print(Blue + ">> " + Reset)
 		}
 		fmt.Println(strconv.Itoa(index) + ". " + vault.Name)
 	}
@@ -129,7 +135,7 @@ func printMainMenu(vault []vault.VaultItem, count int) {
 		fmt.Println("No items in vault")
 	}
 
-	fmt.Println("^Up ||vDown || Add || Edit || Remove || View ")
+	fmt.Println(generateOptionsMenu([]string{"^Up", "vDown", "Add", "Edit", "Remove", "View"}))
 }
 
 func AddMenu(masterPass string) {
@@ -162,4 +168,18 @@ func AddMenu(masterPass string) {
 
 	fullVault = append(fullVault, vaultItem)
 	vault.WriteVault(fullVault, string(password))
+}
+
+func generateOptionsMenu(options []string) string {
+	menu := ""
+
+	for index, option := range options {
+		menu += Blue + string(option[0]) + Reset + option[1:]
+
+		if index != len(options)-1 {
+			menu += " || "
+		}
+	}
+
+	return menu
 }

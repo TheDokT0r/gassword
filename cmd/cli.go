@@ -82,16 +82,16 @@ func Login() []byte {
 func MainMenu(password string, index int) {
 	fullVault, err := vault.ReadVault(password)
 	if err != nil {
-		log.Fatal(fullVault)
+		log.Fatal(err)
 	}
 
 	printMainMenu(fullVault, index)
 	keyCode := keyboardActionDetection()
 	switch keyCode {
 	case Up:
-		index++
-	case Down:
 		index--
+	case Down:
+		index++
 	case Add:
 		ClearScreen()
 		AddMenu(password)
@@ -109,15 +109,15 @@ func keyboardActionDetection() int {
 			keyCode = Up
 		} else if key.Code == keys.Down {
 			keyCode = Down
-		} else if key.String() == "a" {
+		} else if key.String() == "a" || key.String() == "A" {
 			keyCode = Add
 		} else if key.Code == keys.CtrlC {
 			os.Exit(0)
 		} else {
-			return true, nil
+			return false, nil
 		}
 
-		return false, nil
+		return true, nil
 	})
 
 	return keyCode
@@ -152,6 +152,7 @@ func AddMenu(masterPass string) {
 	password, err := term.ReadPassword(int(os.Stdin.Fd()))
 
 	if err != nil {
+
 		log.Fatal(err)
 	}
 
@@ -159,10 +160,6 @@ func AddMenu(masterPass string) {
 
 	fullVault, err := vault.ReadVault(masterPass)
 	if err != nil {
-		vault, err := vault.ReadVault(string(password))
-		if err != nil {
-			log.Fatal(vault)
-		}
 		log.Fatal(err)
 	}
 

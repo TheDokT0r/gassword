@@ -3,7 +3,8 @@ package vault
 import (
 	"encoding/json"
 	"errors"
-	"gli/internal/vault/encryption"
+	"fmt"
+	"gli/internal/encryption"
 	"log"
 	"os"
 	"path"
@@ -88,24 +89,17 @@ func ReadVault(password string) ([]VaultItem, error) {
 func WriteVault(vault []VaultItem, password string) {
 	vaultPath := getVaultLocation()
 
-	f, err := os.Open(vaultPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer f.Close()
-
 	b := vaultToBytes(vault)
 	encryptedData, err := encryption.Encrypt([]byte(password), b)
 
 	if err != nil {
-		log.Fatal(err)
+		// log.Fatal(err)
+		fmt.Println(err.Error())
 	}
 
-	_, err = f.Write(encryptedData)
+	err = os.WriteFile(vaultPath, encryptedData, 0644)
 	if err != nil {
-		log.Fatal(err)
+		// log.Fatal(err)
+		fmt.Println(err.Error())
 	}
-
-	f.Close()
 }

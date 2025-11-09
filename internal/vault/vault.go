@@ -103,3 +103,15 @@ func WriteVault(vault []VaultItem, password string) {
 		fmt.Println(err.Error())
 	}
 }
+
+func RemoveItemFromVault(password string, index int) {
+	vaultItems, err := ReadVault(password)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	vaultCopy := vaultItems[:index]
+	vaultCopy = append(vaultCopy, vaultItems[index+1:]...)
+
+	WriteVault(vaultCopy, password)
+}

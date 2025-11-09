@@ -8,9 +8,11 @@ import (
 	"os/exec"
 	"runtime"
 	"strconv"
+	"strings"
 
 	"atomicgo.dev/keyboard"
 	"atomicgo.dev/keyboard/keys"
+	"golang.design/x/clipboard"
 	"golang.org/x/term"
 )
 
@@ -21,6 +23,7 @@ const (
 	Edit
 	Remove
 	View
+	Copy
 	None
 )
 
@@ -95,6 +98,16 @@ func MainMenu(password string, index int) {
 	case Add:
 		ClearScreen()
 		AddMenu(password)
+	case Remove:
+		vault.RemoveItemFromVault(password, index)
+	case Copy:
+		copyPasswordToClipboard(fullVault[index])
+	}
+
+	if index < 0 {
+		index = len(fullVault) - 1
+	} else if index >= len(fullVault) {
+		index = 0
 	}
 
 	ClearScreen()
@@ -109,8 +122,12 @@ func keyboardActionDetection() int {
 			keyCode = Up
 		} else if key.Code == keys.Down {
 			keyCode = Down
-		} else if key.String() == "a" || key.String() == "A" {
+		} else if strings.ToLower(key.String()) == "a" {
 			keyCode = Add
+		} else if strings.ToLower(key.String()) == "r" {
+			keyCode = Remove
+		} else if strings.ToLower(key.String()) == "c" {
+			keyCode = Copy
 		} else if key.Code == keys.CtrlC {
 			os.Exit(0)
 		} else {
@@ -135,7 +152,7 @@ func printMainMenu(vault []vault.VaultItem, count int) {
 		fmt.Println("No items in vault")
 	}
 
-	fmt.Println(generateOptionsMenu([]string{"^Up", "vDown", "Add", "Edit", "Remove", "View"}))
+	fmt.Println(generateOptionsMenu([]string{"^Up", "vDown", "Add", "Edit", "Remove", "View", "Copy Password"}))
 }
 
 func AddMenu(masterPass string) {
@@ -179,4 +196,13 @@ func generateOptionsMenu(options []string) string {
 	}
 
 	return menu
+}
+
+func copyPasswordToClipboard(item vault.VaultItem) {
+	err := clipboard.Init()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	clipboard.Write(clipboard.FmtText, []byte(item.Password))
 }

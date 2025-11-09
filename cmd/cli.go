@@ -102,6 +102,9 @@ func MainMenu(password string, index int) {
 		vault.RemoveItemFromVault(password, index)
 	case Copy:
 		copyPasswordToClipboard(fullVault[index])
+	case Edit:
+		ClearScreen()
+		EditMenu(fullVault, index, password)
 	}
 
 	if index < 0 {
@@ -128,6 +131,8 @@ func keyboardActionDetection() int {
 			keyCode = Remove
 		} else if strings.ToLower(key.String()) == "c" {
 			keyCode = Copy
+		} else if strings.ToLower(key.String()) == "e" {
+			keyCode = Edit
 		} else if key.Code == keys.CtrlC {
 			os.Exit(0)
 		} else {
@@ -182,6 +187,18 @@ func AddMenu(masterPass string) {
 
 	fullVault = append(fullVault, vaultItem)
 	vault.WriteVault(fullVault, string(password))
+}
+
+func EditMenu(fullVault []vault.VaultItem, index int, password string) {
+	vaultItem := fullVault[index]
+
+	fmt.Print("Username: ")
+	fmt.Scan(&vaultItem.Name)
+	fmt.Print("Email: ")
+	fmt.Scan(&vaultItem.Email)
+
+	fullVault[index] = vaultItem
+	vault.WriteVault(fullVault, password)
 }
 
 func generateOptionsMenu(options []string) string {

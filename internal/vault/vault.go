@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"sort"
 )
 
 func getVaultLocation() string {
@@ -87,6 +88,8 @@ func ReadVault(password string) ([]VaultItem, error) {
 }
 
 func WriteVault(vault []VaultItem, password string) {
+	// vault = sortVault(vault)
+
 	vaultPath := getVaultLocation()
 
 	b := vaultToBytes(vault)
@@ -114,4 +117,12 @@ func RemoveItemFromVault(password string, index int) {
 	vaultCopy = append(vaultCopy, vaultItems[index+1:]...)
 
 	WriteVault(vaultCopy, password)
+}
+
+func sortVault(vaultItems []VaultItem) []VaultItem {
+	sort.Slice(vaultItems, func(i, j int) bool {
+		return vaultItems[i].Name < vaultItems[j].Name
+	})
+
+	return vaultItems
 }
